@@ -26,15 +26,15 @@ app.get('/users',(request,response)=>{
 app.get('/users/:id',(request,response)=>{
     var userId=request.params.id;
     if(!ObjectId.isValid(userId))
-        response.status(400).send(`UserId: ${userId} is invalid`);
+        response.status(404).send(`UserId: ${userId} is invalid`);
     else {
         User.findById(userId)
             .then((user)=>{
             if(!user)
-                response.status(400)
+                response.status(404)
                         .send(`User with id ${userId} not found`);
             else
-                response.status(200).send(user)
+                response.status(200).send({user})
             });
     }
 });
