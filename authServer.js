@@ -1,5 +1,6 @@
 const {mongooseDbClient}=require('./mongooseDbClient.js');
 const {User}=require('./models/user.js');
+const _ =  require('lodash');
 
 const express=require('express');
 const bodyParser=require('body-parser');
@@ -53,6 +54,20 @@ app.delete('/users/:id',(request,response)=>{
                     response.status(200).send(`User has been deleted`);
             });
         }
+});
+
+app.patch('/users/:id',(request,response)=>{
+    var userId=request.params.id;
+    var body=_.pick(request.body,['name','competitionId','teamName','login']);
+    if(!ObjectId.isValid(userId))
+            response.status(404).send(`UserId: ${userId} is invalid`);
+    else{
+        User.findByIdAndUpdate(userId,{$set:body},{new:true}).then((updatedUser)=>{
+            if(!updatedUser)
+                response.status(404).send("Update failed");
+            response.status(200).send({user:updatedUser});
+        }).catch((error)=>response.status(400).send(error));
+    }
 });
 
 app.listen(port,()=>{
