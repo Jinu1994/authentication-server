@@ -38,12 +38,12 @@ beforeEach((done)=>{
         User.insertMany(users);
         }).then(()=>done());
 });
-describe('POST/user',()=>{
+describe('POST/users',()=>{
     it('should create a new user',(done)=>{
         
     
         request(app)
-        .post('/user')
+        .post('/users')
         .send(newUser)
         .expect(200)
         .expect((response)=>{
@@ -66,7 +66,7 @@ describe('POST/user',()=>{
 
     it('should not create a new user',(done)=>{
             request(app)
-            .post('/user')
+            .post('/users')
             .send({})
             .expect(400)
             .end((error,response)=>{

@@ -8,7 +8,7 @@ const {ObjectId}=require('mongodb')
 const port=process.env.PORT||3000;
 app.use(bodyParser.json());
 
-app.post('/user',(request,response)=>{
+app.post('/users',(request,response)=>{
         console.log(request.body);
         var user=new User();
         Object.assign(user,request.body);
@@ -20,7 +20,9 @@ app.post('/user',(request,response)=>{
 });
 
 app.get('/users',(request,response)=>{
-   User.find({}).then((users)=>response.status(200).send({users}),(error)=>response.status(400).send(error));
+   User.find({}).then((users)=>{
+       console.log(users);
+       response.status(200).send({users}),(error)=>response.status(400).send(error)});
 });
 
 app.get('/users/:id',(request,response)=>{
@@ -37,6 +39,20 @@ app.get('/users/:id',(request,response)=>{
                 response.status(200).send({user})
             });
     }
+});
+
+app.delete('/users/:id',(request,response)=>{
+        var userId=request.params.id;
+        if(!ObjectId.isValid(userId))
+            response.status(404).send(`UserId: ${userId} is invalid`);
+        else{
+            User.findByIdAndRemove(userId).then((user)=>{
+                if(!user)
+                    response.status(404).send(`User with Id: ${userId} not found`);
+                else    
+                    response.status(200).send(`User has been deleted`);
+            });
+        }
 });
 
 app.listen(port,()=>{
