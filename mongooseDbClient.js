@@ -1,7 +1,7 @@
 const mongoose=require('mongoose');
 
 mongoose.Promise=global.Promise;
-mongoose.connect("mongodb://jinug:jg@afc13@ds161148.mlab.com:61148/soccer-fever" ||'mongodb://localhost:27017/soccer-fever');
+mongoose.connect("mongodb://jinug:jinu123@ds161148.mlab.com:61148/soccer-fever" ||'mongodb://localhost:27017/soccer-fever');
 
 module.exports={mongooseDbClient:mongoose};
 
