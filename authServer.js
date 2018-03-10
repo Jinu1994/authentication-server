@@ -5,7 +5,7 @@ const express=require('express');
 const bodyParser=require('body-parser');
 const app=express();
 const {ObjectId}=require('mongodb')
-
+const port=process.env.PORT||3000;
 app.use(bodyParser.json());
 
 app.post('/user',(request,response)=>{
@@ -39,8 +39,8 @@ app.get('/users/:id',(request,response)=>{
     }
 });
 
-app.listen(3000,()=>{
-    console.log('Server running on Port: 3000');
+app.listen(port,()=>{
+    console.log(`Server running on Port: ${port}`);
 });
 
 module.exports={app};

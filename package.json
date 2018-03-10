@@ -1,11 +1,15 @@
 {
-  "name": "authentication-server",
+  "name": "authentication-api",
   "version": "1.0.0",
   "description": "API to authenticate user login",
   "main": "authServer.js",
   "scripts": {
+    "start":"node authServer.js",
     "test": "mocha --recursive",
     "test-watch":"nodemon --exec npm test"
+  },
+  "engines": {
+    "node":"8.9.1"
   },
   "author": "Jinu George",
   "license": "ISC",
