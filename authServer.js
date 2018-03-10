@@ -15,7 +15,7 @@ app.post('/user',(request,response)=>{
         user.save().then((savedUser)=>{
             response.send(savedUser);
         },(error)=>{
-            response.status(400).send(e);
+            response.status(400).send(error);
         });
 });
 
