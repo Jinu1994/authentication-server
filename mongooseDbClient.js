@@ -3,7 +3,7 @@ const mongoose=require('mongoose');
 mongoose.Promise=global.Promise;
 const localDbConnection='mongodb://localhost:27017/soccer-fever';
 const mLabDbConnection='mongodb://jinug:jinu123@ds161148.mlab.com:61148/soccer-fever';
-mongoose.connect(localDbConnection);
+mongoose.connect(process.env.MONGODB_URI);
 
 module.exports={mongooseDbClient:mongoose};
 

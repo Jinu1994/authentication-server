@@ -1,3 +1,5 @@
+require('./config');
+
 const {mongooseDbClient}=require('./mongooseDbClient.js');
 const {User}=require('./models/user.js');
 const _ =  require('lodash');
@@ -6,11 +8,9 @@ const express=require('express');
 const bodyParser=require('body-parser');
 const app=express();
 const {ObjectId}=require('mongodb')
-const port=process.env.PORT||3000;
+const port=process.env.PORT;
 app.use(bodyParser.json());
-
 app.post('/users',(request,response)=>{
-        console.log(request.body);
         var user=new User();
         Object.assign(user,request.body);
         user.save().then((savedUser)=>{
@@ -22,7 +22,6 @@ app.post('/users',(request,response)=>{
 
 app.get('/users',(request,response)=>{
    User.find({}).then((users)=>{
-       console.log(users);
        response.status(200).send({users}),(error)=>response.status(400).send(error)});
 });
 
@@ -34,7 +33,7 @@ app.get('/users/:id',(request,response)=>{
         User.findById(userId)
             .then((user)=>{
             if(!user)
-                response.status(404)
+             return  response.status(404)
                         .send(`User with id ${userId} not found`);
             else
                 response.status(200).send({user})
@@ -49,7 +48,7 @@ app.delete('/users/:id',(request,response)=>{
         else{
             User.findByIdAndRemove(userId).then((user)=>{
                 if(!user)
-                    response.status(404).send(`User with Id: ${userId} not found`);
+                  return  response.status(404).send(`User with Id: ${userId} not found`);
                 else    
                     response.status(200).send(`User has been deleted`);
             });
@@ -64,7 +63,7 @@ app.patch('/users/:id',(request,response)=>{
     else{
         User.findByIdAndUpdate(userId,{$set:body},{new:true}).then((updatedUser)=>{
             if(!updatedUser)
-                response.status(404).send("Update failed");
+              return  response.status(404).send("Update failed");
             response.status(200).send({user:updatedUser});
         }).catch((error)=>response.status(400).send(error));
     }

@@ -1,5 +1,4 @@
 const mongoose=require('mongoose');
-const {Login}=require('./login.js');
 
 Schema=mongoose.Schema;
 ObjectId=mongoose.Schema.Types.ObjectId;
@@ -22,7 +21,22 @@ var User=mongoose.model('User',{
         trim:true,
         minlength:1
     },
-    login:Login
+    email:{
+            type:String,
+            required:true,
+            trim:true,
+            unique:true
+        },
+    password:{
+        type:String,
+        minlength:5,
+        required:true
+    },
+    userName:{
+        type:String,
+        minlength:5,
+        required:true
+    }
 });
 
 module.exports={User};

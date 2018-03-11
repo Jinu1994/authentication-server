@@ -9,30 +9,26 @@ const users=[{
     name:"Jacob",
     competitionId:445,
     teamName:"Chelsea FC",
-    login:{
-        _id:"5aa41a02cf57062e348d97ee",
-        userName:"jcb567",
-        password:"jcb_789"
-    }
+    email:"jcb_123@gmail.com",
+    userName:"jcb567",
+    password:"jcb_789"
     },{
      _id:'5aa428fe8816ff4728443907',
     name:"James",
     competitionId:445,
     teamName:"Manchester City FC",
-    login:{
-        userName:"jam234",
-        password:"jam_567"
-    }
+    email:"james45@gmail.com",
+    userName:"jm@sf",
+    password:"jms_123"
     }];
 const newUser={
     _id:"5aa429348816ff4728443908",
     name:"Jinu",
     competitionId:445,
     teamName:"Arsenal FC",
-    login:{
-        userName:"jinu13",
-        password:"jinu123"
-    }
+    email:"jinu.tg13@gmail.com",
+    userName:"jinu13",
+    password:"jinu123"
 };
 
 const userUpdateInfo={
@@ -41,26 +37,29 @@ const userUpdateInfo={
     "teamName":"Liverpool FC"
 };
 const updatedUser={
-    "_id": "5aa3f46ff0ed5916140912a7",
-    "name": "Jacob Daniels",
-    "competitionId": 446,
-    "teamName": "Liverpool FC",
-    "login": {
-        "_id": "5aa41a02cf57062e348d97ee",
-        "userName": "jcb567",
-        "password": "jcb_789"
-    },
-    "__v": 0
+    _id: "5aa3f46ff0ed5916140912a7",
+    name: "Jacob Daniels",
+    competitionId: 446,
+    teamName: "Liverpool FC",
+    email:"jcb_123@gmail.com",
+    userName: "jcb567",
+    password: "jcb_789",
+    __v: 0
 };
+
 beforeEach((done)=>{
     User.remove({_id:{$in:["5aa428fe8816ff4728443907","5aa429348816ff4728443908","5aa3f46ff0ed5916140912a7"]}}).then(()=>{
-        User.insertMany(users);
-        }).then(()=>done());
+       return  User.insertMany(users)
+                    .catch((error)=>console.log(error));
+        }).then(()=>done())
+        .catch((error)=>console.log(error));
 });
+
+
 describe('POST/users',()=>{
+
     it('should create a new user',(done)=>{
-        
-    
+        console.log("requesting");
         request(app)
         .post('/users')
         .send(newUser)
