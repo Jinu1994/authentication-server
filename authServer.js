@@ -3,19 +3,33 @@ require('./config');
 const {mongooseDbClient}=require('./mongooseDbClient.js');
 const {User}=require('./models/user.js');
 const _ =  require('lodash');
+const {authenticate}=require('./authenticate')
 
 const express=require('express');
 const bodyParser=require('body-parser');
 const app=express();
 const {ObjectId}=require('mongodb')
 const port=process.env.PORT;
+
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  });
+  
 app.use(bodyParser.json());
+
 app.post('/users',(request,response)=>{
         var user=new User();
-        Object.assign(user,request.body);
-        user.save().then((savedUser)=>{
-            response.send(savedUser);
-        },(error)=>{
+        Object.assign(user,request.body.newUser);
+
+        user.save().then(()=>{
+            return user.generateAuthToken();
+        }).then((token)=>{
+            response.setHeader('access-control-expose-headers','X-Auth');
+            response.setHeader('X-Auth',token);
+            response.status(200).send(user);
+        }).catch((error)=>{
             response.status(400).send(error);
         });
 });
@@ -40,6 +54,7 @@ app.get('/users/:id',(request,response)=>{
             });
     }
 });
+
 
 app.delete('/users/:id',(request,response)=>{
         var userId=request.params.id;

@@ -4,19 +4,22 @@
   "description": "API to authenticate user login",
   "main": "authServer.js",
   "scripts": {
-    "start":"node authServer.js",
+    "start": "node authServer.js",
     "test": "export NODE_ENV=test || SET \"NODE_ENV=test\" && mocha --timeout 15000 --recursive",
-    "test-watch":"nodemon --exec npm test"
+    "test-watch": "nodemon --exec npm test"
   },
   "engines": {
-    "node":"8.9.1"
+    "node": "8.9.1"
   },
   "author": "Jinu George",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.2",
+    "crypto-js": "^3.1.9-1",
     "expect": "^22.4.0",
     "express": "^4.16.2",
+    "jsonwebtoken": "^8.2.0",
     "mocha": "^5.0.1",
     "mongodb": "^3.0.3",
     "mongoose": "^5.0.8",
