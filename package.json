@@ -5,7 +5,7 @@
   "main": "authServer.js",
   "scripts": {
     "start": "node authServer.js",
-    "test": "export NODE_ENV=test || SET \"NODE_ENV=test\" && mocha --timeout 15000 --recursive",
+    "test": "export NODE_ENV=test || SET \"NODE_ENV=test\" && mocha --timeout 25000 --recursive",
     "test-watch": "nodemon --exec npm test"
   },
   "engines": {

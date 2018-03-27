@@ -20,13 +20,11 @@ app.use(function(req, res, next) {
 app.use(bodyParser.json());
 
 app.post('/users',(request,response)=>{
-        var user=new User();
-        Object.assign(user,request.body.newUser);
-
+        var user=new User(request.body.newUser);
         user.save().then(()=>{
             return user.generateAuthToken();
         }).then((token)=>{
-            response.setHeader('access-control-expose-headers','X-Auth');
+            response.setHeader('access-control-expose-headers','x-auth');
             response.setHeader('X-Auth',token);
             response.status(200).send(user);
         }).catch((error)=>{
@@ -72,7 +70,7 @@ app.delete('/users/:id',(request,response)=>{
 
 app.patch('/users/:id',(request,response)=>{
     var userId=request.params.id;
-    var body=_.pick(request.body,['name','competitionId','teamName','login']);
+    var body=_.pick(request.body,['email']);
     if(!ObjectId.isValid(userId))
             response.status(404).send(`UserId: ${userId} is invalid`);
     else{
@@ -83,6 +81,21 @@ app.patch('/users/:id',(request,response)=>{
         }).catch((error)=>response.status(400).send(error));
     }
 });
+
+app.post('/users/login',(request,response)=>{
+    var loginInfo=request.body.login;
+    User.findByCredentials(loginInfo.email,loginInfo.password).then((user)=>{
+        user.generateAuthToken().then((token)=>{
+            response.setHeader('access-control-expose-headers','x-auth');
+            response.setHeader('X-Auth',token);
+            response.status(200).send(user);
+        })
+           
+    }).catch(error=>{
+        response.status(400).send("Login Failed");
+    });
+});
+
 
 app.listen(port,()=>{
     console.log(`Server running on Port: ${port}`);

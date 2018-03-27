@@ -4,78 +4,48 @@ const {ObjectId} = require('mongodb')
 
 const {app}=require('./../authServer.js');
 const {User}=require('./../models/user');
-const users=[{
-    _id:'5aa3f46ff0ed5916140912a7',
+const {users,newUser,populateUsers} = require('./seedData');
+
+const userUpdateInfo={
+    email:"jinu.tg14@gmail.com"
+};
+const updatedUser={
+    _id:'5aa3f46ff0ed5916140956b7',
     name:"Jacob",
     competitionId:445,
     teamName:"Chelsea FC",
-    email:"jcb_123@gmail.com",
+    email:"jinu.tg14@gmail.com",
     userName:"jcb567",
     password:"jcb_789"
-    },{
-     _id:'5aa428fe8816ff4728443907',
-    name:"James",
-    competitionId:445,
-    teamName:"Manchester City FC",
-    email:"james45@gmail.com",
-    userName:"jm@sf",
-    password:"jms_123"
-    }];
-const newUser={
-    _id:"5aa429348816ff4728443908",
-    name:"Jinu",
-    competitionId:445,
-    teamName:"Arsenal FC",
+    };
+
+const loginInfo={
     email:"jinu.tg13@gmail.com",
-    userName:"jinu13",
     password:"jinu123"
 };
 
-const userUpdateInfo={
-    "name":"Jacob Daniels",
-    "competitionId":446,
-    "teamName":"Liverpool FC"
-};
-const updatedUser={
-    _id: "5aa3f46ff0ed5916140912a7",
-    name: "Jacob Daniels",
-    competitionId: 446,
-    teamName: "Liverpool FC",
-    email:"jcb_123@gmail.com",
-    userName: "jcb567",
-    password: "jcb_789",
-    __v: 0
-};
-
-beforeEach((done)=>{
-    User.remove({_id:{$in:["5aa428fe8816ff4728443907","5aa429348816ff4728443908","5aa3f46ff0ed5916140912a7"]}}).then(()=>{
-       return  User.insertMany(users)
-                    .catch((error)=>console.log(error));
-        }).then(()=>done())
-        .catch((error)=>console.log(error));
-});
+beforeEach(populateUsers);
 
 
 describe('POST/users',()=>{
 
     it('should create a new user',(done)=>{
-        console.log("requesting");
         request(app)
         .post('/users')
-        .send(newUser)
+        .send({newUser})
         .expect(200)
         .expect((response)=>{
-            var returnedUser=response.body;
-            expect(returnedUser.name).toEqual(newUser.name);
+               expect(response.headers['x-auth']).toExist;
+               expect(response.body._id).toExist;
+               expect(response.body.email).toBe(newUser.email);
         })
         .end((error,response)=>{
             if(error){
                 return done(error);
             }
-
-            User.find({name:"Jinu"}).then((returnedUsers)=>{
-                expect(returnedUsers.length).toBe(1);
-                expect(returnedUsers[0].name).toEqual(newUser.name);
+            User.findById(newUser._id).then((userInDb)=>{
+                expect(userInDb).toExist;
+                expect(userInDb.password).not.toBe(newUser.password);
                 done();
             }).catch((e)=>done(e));
 
@@ -91,8 +61,8 @@ describe('POST/users',()=>{
                     if(error)
                         return  done(error);
             });
-            User.find({name:"Jinu"}).then((returnedUsers)=>{
-                expect(returnedUsers.length).toBe(0);
+            User.find({name:"Jacob"}).then((usersInDb)=>{
+                expect(usersInDb.length).toBe(0);
                 done();
             });
         });
@@ -119,7 +89,7 @@ describe('GET/Users/:id',()=>{
     .expect(200)
     .expect((response)=>{
         var user=response.body.user;
-        expect(user.name).toBe(users[0].name);
+        expect(user.email).toBe(users[0].email);
     })
     .end(done);
     });
@@ -143,12 +113,12 @@ describe('GET/Users/:id',()=>{
 describe('DELETE /Users/:id',()=>{
     it("should delete the user",(done)=>{
         request(app)
-        .delete('/users/5aa3f46ff0ed5916140912a7')
+        .delete(`/users/${users[0]._id}`)
         .expect(200)
         .end((error,response)=>{
             if(error)
-                done(error);
-           User.findById('5aa3f46ff0ed5916140912a7')
+                return done(error);
+           User.findById(users[0]._id)
                 .then((deletedUser)=>{
                         expect(deletedUser).toNotExist;
                         done();
@@ -174,20 +144,18 @@ describe('DELETE /Users/:id',()=>{
 describe('PATCH /users/:id',()=>{
     it("should update the user",(done)=>{
         request(app)
-        .patch(`/users/5aa3f46ff0ed5916140912a7`)
+        .patch(`/users/${users[0]._id}`)
         .send(userUpdateInfo)
         .expect(200)
         .expect((response)=>{
                 var updatedUserResponse=response.body.user;
-                expect(updatedUserResponse).toEqual(updatedUser);
+                expect(updatedUserResponse.email).toEqual(updatedUser.email);
         })
         .end((error,response)=>{
                 if(error)
                   return  done(error);
-             User.findById('5aa3f46ff0ed5916140912a7').then((updatedUserInDb)=>{
-                 expect(updatedUserInDb.name).toEqual(userUpdateInfo.name);
-                 expect(updatedUserInDb.competitionId).toEqual(userUpdateInfo.competitionId);
-                 expect(updatedUserInDb.teamName).toEqual(userUpdateInfo.teamName);
+             User.findById(users[0]._id).then((updatedUserInDb)=>{
+                 expect(updatedUserInDb.email).toEqual(userUpdateInfo.email);
                  done();
              }).catch((error)=>{
                  done(error);
@@ -211,3 +179,28 @@ describe('PATCH /users/:id',()=>{
     });
 });
 
+
+describe('POST users/login',()=>{
+    it('should return the user and token',(done)=>{
+        request(app)
+        .post('/users/login')
+        .send({login:loginInfo})
+        .expect(200)
+        .expect((response)=>{
+                expect(response.headers['X-Auth']).toExist;
+                var returnedUser=response.body;
+                expect(returnedUser._id).toExist;
+                expect(returnedUser.email).toEqual(users[0].email);
+        })
+        .end((error,response)=>{
+            if(error)
+                return done(error);
+            
+            User.findById(users[0]._id).then((userInDb)=>{
+                        var tokensLength=userInDb.tokens.length;
+                    expect(userInDb.tokens[tokensLength-1].token).toEqual(response.headers['x-auth']);
+                    done();
+            }).catch((error)=>done(error));
+        });
+    });
+});
